@@ -10,7 +10,8 @@
 #include "libs/Kernel.h"
 #include "libs/utils.h"
 #include "libs/Pin.h"
-
+#include <cstdio>
+#define error printf
 
 using namespace std;
 #include <vector>

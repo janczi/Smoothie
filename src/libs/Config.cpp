@@ -41,7 +41,8 @@ void Config::on_console_line_received( void* argument ){
 
 // Command to retreive the value of a specific configuration setting
 void Config::config_get_command( string parameter ){
-    this->kernel->serial->printf("%s\r\n", this->value( get_checksum( parameter ) )->value.c_str() ); 
+    //this->kernel->serial->
+    printf("%s\r\n", this->value( get_checksum( parameter ) )->value.c_str() ); 
 }
 
 // Command to set the value of a specific configuration setting
@@ -77,7 +78,9 @@ void Config::set_string( string setting, string value ){
             string candidate = buffer.substr(begin_key,  buffer.find_first_of(" ", begin_key) - begin_key);
             if( candidate.compare(setting) != 0 ){ buffer.clear(); continue; }
             int free_space = int(int(buffer.find_first_of("\r\n#", begin_value+1))-begin_value); 
-            if( int(value.length()) >= free_space ){ this->kernel->serial->printf("ERROR: Not enough room for value\r\n"); fclose(lp); return; }
+            if( int(value.length()) >= free_space ){ 
+		//this->kernel->serial->
+		printf("ERROR: Not enough room for value\r\n"); fclose(lp); return; }
             // Update value
             for( int i = value.length(); i < free_space; i++){ value += " "; }
             fpos_t pos;
@@ -92,7 +95,8 @@ void Config::set_string( string setting, string value ){
         }
     } while (c != EOF);  
     fclose(lp);
-    this->kernel->serial->printf("ERROR: configuration key not found\r\n");
+    //this->kernel->serial->
+	printf("ERROR: configuration key not found\r\n");
 }
 
 ConfigValue* Config::value(uint16_t check_sum_a, uint16_t check_sum_b, uint16_t check_sum_c ){
