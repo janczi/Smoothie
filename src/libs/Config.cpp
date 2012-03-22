@@ -61,7 +61,8 @@ void Config::config_load_command( string parameters ){
 // Because we don't like to waste space in Flash with lengthy config parameter names, we take a checksum instead so that the name does not have to be stored
 // See get_checksum
 void Config::set_string( string setting, string value ){
-    // Open the config file ( find it if we haven't already found it ) 
+   return; 
+   // Open the config file ( find it if we haven't already found it ) 
     FILE *lp = fopen(this->get_config_file().c_str(), "r+");
     string buffer;
     int c; 
@@ -180,6 +181,7 @@ ConfigValue* Config::value(vector<uint16_t> check_sums){
 }
 
 bool Config::has_config_file(){
+    return false;
     if( this->config_file_found ){ return true; }
     this->try_config_file("/local/config");
     this->try_config_file("/sd/config");

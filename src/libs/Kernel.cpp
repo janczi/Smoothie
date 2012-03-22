@@ -8,7 +8,7 @@
 using namespace std;
 #include <vector>
 #include "libs/Kernel.h"
-//#include "libs/Module.h"
+#include "libs/Module.h"
 #include "libs/Config.h"
 //#include "libs/nuts_bolts.h"
 //#include "libs/SlowTicker.h"
