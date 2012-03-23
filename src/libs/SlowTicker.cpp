@@ -7,29 +7,49 @@
 
 using namespace std;
 #include <vector>
-#include "libs/nuts_bolts.h"
 #include "libs/Module.h"
 #include "libs/Kernel.h"
 #include "SlowTicker.h"
 #include "libs/Hook.h"
-
+extern "C" {
+#include <board.h>
+#include <irq/irq.h>
+#include <tc/tc.h>
+}
 
 SlowTicker* global_slow_ticker;
+
+extern "C" void TC1_IrqHandler (void){
+    volatile unsigned int dummy;
+    // Clear status bit to acknowledge interrupt
+    dummy = AT91C_BASE_TC1->TC_SR;
+    global_slow_ticker->tick(); 
+}
+
 
 SlowTicker::SlowTicker(){
     this->max_frequency = 1;
     global_slow_ticker = this;
-    LPC_SC->PCONP |= (1 << 22);     // Power Ticker ON
-    LPC_TIM2->MR0 = 10000;        // Initial dummy value for Match Register
-    LPC_TIM2->MCR = 3;              // Match on MR0, reset on MR0
-    LPC_TIM2->TCR = 1;              // Enable interrupt
-    NVIC_EnableIRQ(TIMER2_IRQn);    // Enable interrupt handler
 }
 
 void SlowTicker::set_frequency( int frequency ){
-    LPC_TIM2->MR0 = int(floor((SystemCoreClock/4)/frequency));  // SystemCoreClock/4 = Timer increments in a second
-    LPC_TIM2->TCR = 3;  // Reset
-    LPC_TIM2->TCR = 1;  // Reset
+    unsigned int div;
+    unsigned int tcclks;
+
+    // Enable peripheral clock
+    AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_TC1;
+
+    // Configure TC for a 4Hz frequency and trigger on RC compare
+    TC_FindMckDivisor(frequency, BOARD_MCK, &div, &tcclks);
+    TC_Configure(AT91C_BASE_TC1, tcclks | AT91C_TC_CPCTRG);
+    AT91C_BASE_TC1->TC_RC = (BOARD_MCK / div) / frequency; // timerFreq / desiredFreq
+
+    // Configure and enable interrupt on RC compare
+    IRQ_ConfigureIT(AT91C_ID_TC1, 0, TC1_IrqHandler);
+    AT91C_BASE_TC1->TC_IER = AT91C_TC_CPCS;
+    IRQ_EnableIT(AT91C_ID_TC1);
+
+    TC_Start(AT91C_BASE_TC1);
 }
 
 void SlowTicker::tick(){
@@ -43,10 +63,4 @@ void SlowTicker::tick(){
     }
 }
 
-extern "C" void TIMER2_IRQHandler (void){
-    if((LPC_TIM2->IR >> 0) & 1){  // If interrupt register set for MR0
-        LPC_TIM2->IR |= 1 << 0;   // Reset it 
-        global_slow_ticker->tick(); 
-    }
-}
 

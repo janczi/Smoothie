@@ -10,7 +10,7 @@
 #include "libs/Module.h"
 
 #include "libs/Config.h"
-//#include "libs/SlowTicker.h"
+#include "libs/SlowTicker.h"
 //#include "libs/StepTicker.h"
 //#include "libs/Adc.h"
 //#include "libs/Pauser.h"
@@ -63,8 +63,8 @@ class Kernel {
 //        Pauser*           pauser;
 
         int debug;
- //       SlowTicker*       slow_ticker;
- //       StepTicker*       step_ticker;
+        SlowTicker*       slow_ticker;
+//        StepTicker*       step_ticker;
  //       Adc*              adc;
 
     private:

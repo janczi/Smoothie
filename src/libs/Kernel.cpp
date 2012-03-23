@@ -11,7 +11,7 @@ using namespace std;
 #include "libs/Module.h"
 #include "libs/Config.h"
 //#include "libs/nuts_bolts.h"
-//#include "libs/SlowTicker.h"
+#include "libs/SlowTicker.h"
 //#include "libs/Adc.h"
 //#include "libs/Pauser.h"
 
@@ -53,8 +53,8 @@ Kernel::Kernel(){
   //  this->add_module( this->serial );
   
     // HAL stuff 
-   // this->slow_ticker          = new SlowTicker();
-   // this->step_ticker          = new StepTicker();
+    this->slow_ticker          = new SlowTicker();
+//    this->step_ticker          = new StepTicker();
    // this->adc                  = new Adc();
 
     // LPC17xx-specific 
