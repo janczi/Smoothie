@@ -13,29 +13,60 @@ using namespace std;
 #include "libs/Module.h"
 #include "libs/Kernel.h"
 #include "StepTicker.h"
-
-
+extern "C" {
+#include <math.h>
+#include <board.h>
+#include <irq/irq.h>
+#include <tc/tc.h>
+}
 StepTicker* global_step_ticker;
+
+
+extern "C" void TC0_IRQHandler (void){
+    if(AT91C_BASE_TC0->TC_SR & AT91C_TC_CPCS){  // If interrupt register set for register C
+        global_step_ticker->tick(); 
+    }
+    if(AT91C_BASE_TC0->TC_SR & AT91C_TC_CPBS){  // If interrupt register set for register B
+        global_step_ticker->reset_tick();
+    }
+    volatile unsigned int dummy;
+    // Clear status bit to acknowledge interrupt
+    dummy = AT91C_BASE_TC0->TC_SR;
+    
+}
+
+
 
 StepTicker::StepTicker(){
     global_step_ticker = this;
-    LPC_TIM0->MR0 = 1000000;        // Initial dummy value for Match Register
-    LPC_TIM0->MCR = 11;              // Match on MR0, reset on MR0, match on MR1
-    LPC_TIM0->TCR = 1;              // Enable interrupt
-    NVIC_EnableIRQ(TIMER0_IRQn);    // Enable interrupt handler
+    AT91C_BASE_TC0->TC_RB = 0;
+    
 }
 
 void StepTicker::set_frequency( double frequency ){
     this->frequency = frequency;
-    LPC_TIM0->MR0 = int(floor((SystemCoreClock/4)/frequency));  // SystemCoreClock/4 = Timer increments in a second
-    if( LPC_TIM0->TC > LPC_TIM0->MR0 ){
-        LPC_TIM0->TCR = 3;  // Reset
-        LPC_TIM0->TCR = 1;  // Reset
-    }
+    unsigned int div;
+    unsigned int tcclks;
+
+    // Enable peripheral clock
+    AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_TC0;
+
+    // Configure TC for a 4Hz frequency and trigger on RC compare
+    TC_FindMckDivisor(frequency, BOARD_MCK, &div, &tcclks);
+    TC_Configure(AT91C_BASE_TC0, tcclks | AT91C_TC_CPCTRG);
+    AT91C_BASE_TC0->TC_RC = (BOARD_MCK / div) / frequency; // timerFreq / desiredFreq
+    this->div=div;
+    // Configure and enable interrupt on RC compare
+    IRQ_ConfigureIT(AT91C_ID_TC0, 0, TC0_IRQHandler);
+    AT91C_BASE_TC0->TC_IER = AT91C_TC_CPCS|AT91C_TC_CPBS;
+    IRQ_EnableIT(AT91C_ID_TC0);
+
+    TC_Start(AT91C_BASE_TC0);
+
 }
 
 void StepTicker::set_reset_delay( double seconds ){
-    LPC_TIM0->MR1 = int(floor(double(SystemCoreClock/4)*( seconds )));  // SystemCoreClock/4 = Timer increments in a second
+    AT91C_BASE_TC0->TC_RB = int(floor(double(BOARD_MCK/(this->div))*( seconds )));  // SystemCoreClock/divisor = Timer increments in a second
 }
 
 void StepTicker::tick(){
@@ -47,17 +78,6 @@ void StepTicker::tick(){
 void StepTicker::reset_tick(){
     for (int i=0; i<this->reset_hooks.size(); i++){ 
         this->reset_hooks.at(i)->call();
-    }
-}
-
-extern "C" void TIMER0_IRQHandler (void){
-    if((LPC_TIM0->IR >> 0) & 1){  // If interrupt register set for MR0
-        LPC_TIM0->IR |= 1 << 0;   // Reset it 
-        global_step_ticker->tick(); 
-    }
-    if((LPC_TIM0->IR >> 1) & 1){  // If interrupt register set for MR1
-        LPC_TIM0->IR |= 1 << 1;   // Reset it
-        global_step_ticker->reset_tick();
     }
 }
 

@@ -136,7 +136,7 @@ VPATH += ./modules/communication/utils
 VPATH += ./modules/robot
 VPATH += .
 
-CPP_OBJECTS += tinynew.o Kernel.o Config.o Module.o utils.o Pinll.o SlowTicker.o Hook.o #StepTicker.o
+CPP_OBJECTS += tinynew.o Kernel.o Config.o Module.o utils.o Pinll.o SlowTicker.o Hook.o StepTicker.o
 #CPP_OBJECTS += utils.o Gcode.o GcodeDispatch.o Planner.o Block.o Player.o #Stepper.o
 CPP_OBJECTS += main.o
 

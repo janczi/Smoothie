@@ -11,7 +11,7 @@
 
 #include "libs/Config.h"
 #include "libs/SlowTicker.h"
-//#include "libs/StepTicker.h"
+#include "libs/StepTicker.h"
 //#include "libs/Adc.h"
 //#include "libs/Pauser.h"
 //#include "modules/communication/SerialConsole.h"
@@ -64,7 +64,7 @@ class Kernel {
 
         int debug;
         SlowTicker*       slow_ticker;
-//        StepTicker*       step_ticker;
+        StepTicker*       step_ticker;
  //       Adc*              adc;
 
     private:

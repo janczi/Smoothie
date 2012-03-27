@@ -39,7 +39,8 @@ class StepTicker{
         }
 
 
-        vector<FPointer*> hooks; 
+	int div;        
+	vector<FPointer*> hooks; 
         vector<FPointer*> reset_hooks; 
         double frequency;
 

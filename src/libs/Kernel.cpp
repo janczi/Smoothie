@@ -54,7 +54,7 @@ Kernel::Kernel(){
   
     // HAL stuff 
     this->slow_ticker          = new SlowTicker();
-//    this->step_ticker          = new StepTicker();
+    this->step_ticker          = new StepTicker();
    // this->adc                  = new Adc();
 
     // LPC17xx-specific 
