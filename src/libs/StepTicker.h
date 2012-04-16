@@ -20,7 +20,7 @@ using namespace std;
 class StepTicker{
     public:
         StepTicker();
-        void set_frequency( double frequency );
+        void set_frequency( int frequency );
         void tick();
         void set_reset_delay( double seconds );
         void reset_tick();

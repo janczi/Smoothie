@@ -37,10 +37,12 @@ void Planner::on_config_reload(void* argument){
 
 // Append a block to the queue, compute it's speed factors
 void Planner::append_block( int target[], double feed_rate, double distance, double deltas[] ){
-   
+     volatile int i;
+
     // Stall here if the queue is ful
     while( this->kernel->player->queue.size() >= this->kernel->player->queue.capacity()-2 ){ 
-        wait_us(500); 
+	for(i=0;i<100000;++i)
+		i=i;//will not be optimized away due to volatile keyword 
     }
 
     Block* block = this->kernel->player->new_block();

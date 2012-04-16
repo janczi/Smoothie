@@ -40,9 +40,7 @@ void GcodeDispatch::on_console_line_received(void * line){
         gcode.command = possible_command;
         gcode.stream = new_message.stream; 
         this->kernel->call_event(ON_GCODE_RECEIVED, &gcode ); 
-        
         new_message.stream->printf("ok\r\n");
-
     // Ignore comments 
     }else if( first_char == ';' || first_char == '(' ){
         new_message.stream->printf("ok\r\n");

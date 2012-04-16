@@ -12,6 +12,7 @@ using namespace std;
 #include "SlowTicker.h"
 #include "libs/Hook.h"
 extern "C" {
+#include <math.h>
 #include <board.h>
 #include <irq/irq.h>
 #include <tc/tc.h>
@@ -19,10 +20,10 @@ extern "C" {
 
 SlowTicker* global_slow_ticker;
 
-extern "C" void TC1_IrqHandler (void){
+extern "C" void TC0_IrqHandler (void){
     volatile unsigned int dummy;
     // Clear status bit to acknowledge interrupt
-    dummy = AT91C_BASE_TC1->TC_SR;
+    dummy = AT91C_BASE_TC0->TC_SR;
     global_slow_ticker->tick(); 
 }
 
@@ -37,19 +38,19 @@ void SlowTicker::set_frequency( int frequency ){
     unsigned int tcclks;
 
     // Enable peripheral clock
-    AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_TC1;
+    AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_TC0;
 
     // Configure TC for a 4Hz frequency and trigger on RC compare
     TC_FindMckDivisor(frequency, BOARD_MCK, &div, &tcclks);
-    TC_Configure(AT91C_BASE_TC1, tcclks | AT91C_TC_CPCTRG);
+    TC_Configure(AT91C_BASE_TC0, tcclks | AT91C_TC_CPCTRG);
     AT91C_BASE_TC1->TC_RC = (BOARD_MCK / div) / frequency; // timerFreq / desiredFreq
 
     // Configure and enable interrupt on RC compare
-    IRQ_ConfigureIT(AT91C_ID_TC1, 0, TC1_IrqHandler);
-    AT91C_BASE_TC1->TC_IER = AT91C_TC_CPCS;
-    IRQ_EnableIT(AT91C_ID_TC1);
+    IRQ_ConfigureIT(AT91C_ID_TC0, 0, TC0_IrqHandler);
+    AT91C_BASE_TC0->TC_IER = AT91C_TC_CPCS;
+    IRQ_EnableIT(AT91C_ID_TC0);
 
-    TC_Start(AT91C_BASE_TC1);
+    TC_Start(AT91C_BASE_TC0);
 }
 
 void SlowTicker::tick(){

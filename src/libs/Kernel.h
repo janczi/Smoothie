@@ -13,12 +13,12 @@
 #include "libs/SlowTicker.h"
 #include "libs/StepTicker.h"
 //#include "libs/Adc.h"
-//#include "libs/Pauser.h"
-//#include "modules/communication/SerialConsole.h"
-//#include "modules/communication/GcodeDispatch.h"
-//#include "modules/robot/Planner.h"
-//#include "modules/robot/Robot.h"
-//#include "modules/robot/Stepper.h"
+#include "libs/Pauser.h"
+#include "modules/communication/SerialConsole.h"
+#include "modules/communication/GcodeDispatch.h"
+#include "modules/robot/Planner.h"
+#include "modules/robot/Robot.h"
+#include "modules/robot/Stepper.h"
 
 // See : http://smoothieware.org/listofevents
 #define NUMBER_OF_DEFINED_EVENTS   11
@@ -53,14 +53,14 @@ class Kernel {
         void call_event(unsigned int id_event, void * argument);
 
         // These modules are aviable to all other modules
-//        SerialConsole*    serial;
-//        GcodeDispatch*    gcode_dispatch;
-//        Robot*            robot;
-//        Stepper*          stepper;
-//        Planner*          planner;
+        SerialConsole*    serial;
+        GcodeDispatch*    gcode_dispatch;
+        Robot*            robot;
+        Stepper*          stepper;
+        Planner*          planner;
         Config*           config;
-//        Player*           player;
-//        Pauser*           pauser;
+        Player*           player;
+        Pauser*           pauser;
 
         int debug;
         SlowTicker*       slow_ticker;

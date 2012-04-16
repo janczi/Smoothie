@@ -18,6 +18,7 @@ using std::string;
 #include "arm_solutions/BaseSolution.h"
 #include "arm_solutions/CartesianSolution.h"
 
+
 Robot::Robot(){
     this->inch_mode = false;
     this->absolute_mode = false;
@@ -29,6 +30,7 @@ Robot::Robot(){
 
 //Called when the module has just been loaded
 void Robot::on_module_loaded() {
+    
     this->arm_solution = new CartesianSolution(this->kernel->config);
     this->register_for_event(ON_GCODE_RECEIVED);
 

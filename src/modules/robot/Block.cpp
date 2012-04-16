@@ -16,7 +16,10 @@
 using std::string;
 #include <vector>
 #include "../communication/utils/Gcode.h"
-
+extern "C"{
+#include <board.h>
+#include <cmsis/core_cm3.h>
+}
 Block::Block(){
     clear_vector(this->steps);
     this->times_taken = 0;   // A block can be "taken" by any number of modules, and the next block is not moved to until all the modules have "released" it. This value serves as a tracker.

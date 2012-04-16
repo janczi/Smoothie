@@ -21,18 +21,19 @@ using std::string;
 
 class SerialConsole : public Module, public StreamOutput {
     public:
-        SerialConsole( PinName rx_pin, PinName tx_pin, int baud_rate );
+        SerialConsole( const char* rx_pin, const char* tx_pin, int baud_rate );
         
         virtual void on_module_loaded();
-        void on_serial_char_received();
+        void on_serial_char_received( char received);
         virtual void on_main_loop(void * argument);
         bool has_char(char letter);
+        int find_char(char letter);
         int printf(const char* format, ...);
         
         //string receive_buffer;                 // Received chars are stored here until a newline character is received
         //vector<std::string> received_lines;    // Received lines are stored here until they are requested
         RingBuffer<char,256> buffer;             // Receive buffer
-        Serial* serial;
+//        Serial* serial;
 };
 
 #endif
